@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  axum-template:
+    image: postgres
+    container_name: axum-template
+    ports:
+      - "127.0.0.2:5432:5432"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=main
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+volumes:
+  pg-data:
