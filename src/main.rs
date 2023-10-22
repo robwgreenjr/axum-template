@@ -2,12 +2,12 @@ use std::env;
 use std::sync::Arc;
 
 use axum::Router;
-use axum::routing::get;
 use sea_orm::{Database, DatabaseConnection};
 
-use crate::users::routes::index::find_all;
+use crate::users::routes::user_routes;
 
 mod users;
+mod global;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -23,7 +23,9 @@ async fn main() {
 
     let state = Arc::new(AppState { db });
 
-    let app = Router::new().route("/users", get(find_all)).with_state(state);
+    let app = Router::new()
+        .merge(user_routes())
+        .with_state(state);
 
     let host = env::var("HOST").expect("HOST is not set in .env file");
     let port = env::var("PORT").expect("PORT is not set in .env file");

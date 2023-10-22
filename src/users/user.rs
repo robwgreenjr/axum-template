@@ -1,6 +1,27 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize)]
+pub struct Dto {
+    pub id: Option<u64>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub created_on: Option<String>,
+    pub updated_on: Option<String>,
+}
+
+pub struct Index {
+    pub id: Option<u64>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub created_on: Option<DateTimeWithTimeZone>,
+    pub updated_on: Option<DateTimeWithTimeZone>,
+}
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "user_simple")]
 pub struct Model {
