@@ -8,6 +8,7 @@ use crate::users::routes::user_routes;
 
 mod users;
 mod global;
+mod database;
 
 #[derive(Clone)]
 pub struct AppState {

@@ -8,6 +8,7 @@ use sea_orm::{ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder,
 use serde::{Deserialize, Serialize};
 
 use crate::AppState;
+use crate::database::query_builder::QueryBuilder;
 use crate::global::parameter_query_builder::ParameterQueryBuilder;
 use crate::users::user;
 
@@ -38,12 +39,7 @@ pub async fn find_all(
 ) -> Result<Json<DataResponse<user::Model>>, (StatusCode, &'static str)> {
     let limit = 200;
 
-    let users: Vec<user::Model> = user::Entity::find()
-        .order_by_asc(user::Column::Id)
-        .offset(400)
-        .limit(limit)
-        .all(&state.db).await
-        .expect("Cannot find users");
+    let users: Vec<user::Model> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
     let count = user::Entity::find()
         .count(&state.db).await
         .expect("Cannot count users");

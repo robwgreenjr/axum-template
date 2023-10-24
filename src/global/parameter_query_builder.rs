@@ -199,7 +199,7 @@ impl ParameterQueryResult {
             let mut column_filter_list_operator = QueryOperator::AND;
             let mut cleaned_filter;
             let check_filter_list_operator = filter.clone();
-            let testing = format!("[{:?}]", QueryOperator::OR);
+
             match check_filter_list_operator {
                 s if s.starts_with(&format!("[{:?}]", QueryOperator::OR).to_lowercase()) => {
                     column_filter_list_operator = QueryOperator::OR;
