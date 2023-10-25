@@ -14,8 +14,18 @@ thread 'tokio-runtime-worker' panicked at 'called `Option::unwrap()` on a `None`
 
 ### - Support DB query builder with nested table relationships
 
-### - See how events work
+### - See how events work (implement for user create/update/delete)
 
 ### - Complete user module (finalize basic architecture for a module)
 
-### - Add more TODOs....
+### - Port Hypermedia
+
+### - Port Authentication & Authorization
+
+### - Port AWS basics (only SES for now)
+
+### - Setup Migration plan
+
+### - Create cli tool for basic things e.g create admin user, reset password, and migration/seeder if needed
+
+### - Document query parameter builder
