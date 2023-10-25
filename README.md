@@ -13,3 +13,9 @@ thread 'tokio-runtime-worker' panicked at 'called `Option::unwrap()` on a `None`
 ```
 
 ### - Support DB query builder with nested table relationships
+
+### - See how events work
+
+### - Complete user module (finalize basic architecture for a module)
+
+### - Add more TODOs....
