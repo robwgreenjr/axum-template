@@ -40,13 +40,16 @@ pub async fn find_all(
     let limit = 200;
 
     let users: Vec<user::Model> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
+
     let count = user::Entity::find()
-        .count(&state.db).await
+        .count(&state.db)
+        .await
         .expect("Cannot count users");
     let remaining_count = user::Entity::find()
         .order_by_asc(user::Column::Id)
         .filter(user::Column::Id.gte(400))
-        .count(&state.db).await
+        .count(&state.db)
+        .await
         .expect("Cannot find users");
     let page_count = count / limit;
 
@@ -55,6 +58,7 @@ pub async fn find_all(
     let mut custom_query_cloned = custom_query.clone();
     custom_query_cloned = custom_query.clone()
                                       .filter(user::Column::FirstName.contains("Ri"));
+
     let result = custom_query_cloned
         .all(&state.db).await
         .expect("Cannot find users");
