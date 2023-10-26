@@ -1,6 +1,6 @@
-use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryFilter, QueryOrder, QuerySelect};
+use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryFilter as QF, QueryOrder, QuerySelect};
 
-use crate::global::parameter_query_builder::{ParameterQueryResult, QueryFilter as QF, QuerySort};
+use crate::global::parameter_query_builder::{ParameterQueryResult, QueryFilter, QuerySort};
 
 pub struct QueryBuilder;
 
@@ -61,7 +61,7 @@ impl QueryBuilder {
                     }
 
                     match filter.filter {
-                        QF::GT => {
+                        QueryFilter::GT => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::gt(&column, value));
@@ -74,7 +74,7 @@ impl QueryBuilder {
                                 }
                             }
                         }
-                        QF::GTE => {
+                        QueryFilter::GTE => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::gte(&column, value));
@@ -87,7 +87,7 @@ impl QueryBuilder {
                                 }
                             }
                         }
-                        QF::LT => {
+                        QueryFilter::LT => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::lt(&column, value));
@@ -100,7 +100,7 @@ impl QueryBuilder {
                                 }
                             }
                         }
-                        QF::LTE => {
+                        QueryFilter::LTE => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::lte(&column, value));
@@ -113,7 +113,7 @@ impl QueryBuilder {
                                 }
                             }
                         }
-                        QF::EQ => {
+                        QueryFilter::EQ => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::eq(&column, value));
@@ -126,7 +126,7 @@ impl QueryBuilder {
                                 }
                             }
                         }
-                        QF::NE => {
+                        QueryFilter::NE => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::ne(&column, value));
@@ -139,10 +139,10 @@ impl QueryBuilder {
                                 }
                             }
                         }
-                        QF::LIKE => {
+                        QueryFilter::LIKE => {
                             conditions = conditions.clone().add(E::Column::contains(&column, filter.value));
                         }
-                        QF::CURSOR => {
+                        QueryFilter::CURSOR => {
                             match parse_number(&filter.value) {
                                 NumberType::Integer(value) => {
                                     conditions = conditions.clone().add(E::Column::gte(&column, value));

@@ -33,6 +33,7 @@ pub struct MetaData {
 #[derive(Serialize, Deserialize)]
 pub struct MetaQueryData {}
 
+// TODO: Finish all user routes
 pub async fn find_all(
     state: State<Arc<AppState>>,
     ParameterQueryBuilder(parameter_query_result): ParameterQueryBuilder,
@@ -41,6 +42,7 @@ pub async fn find_all(
 
     let users: Vec<user::Model> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
 
+    // TODO: move meta data builder to global helper
     let count = user::Entity::find()
         .count(&state.db)
         .await
@@ -52,16 +54,6 @@ pub async fn find_all(
         .await
         .expect("Cannot find users");
     let page_count = count / limit;
-
-    let custom_query = user::Entity::find()
-        .order_by_asc(user::Column::Id);
-    let mut custom_query_cloned = custom_query.clone();
-    custom_query_cloned = custom_query.clone()
-                                      .filter(user::Column::FirstName.contains("Ri"));
-
-    let result = custom_query_cloned
-        .all(&state.db).await
-        .expect("Cannot find users");
 
     let next = user::Entity::find()
         .order_by_asc(user::Column::Id)
