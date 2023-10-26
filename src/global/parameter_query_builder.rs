@@ -106,7 +106,17 @@ impl ParameterQueryResult {
             limit: 200,
         };
 
-        let query_string = query.as_ref().unwrap();
+        let query_string;
+        let has_query_string = query.as_ref();
+        match has_query_string {
+            None => {
+                return result;
+            }
+            Some(value) => {
+                query_string = value;
+            }
+        }
+
         let possible_params = query_string.split("&");
 
         // TODO: Move limit logic to function (create a builder like pattern for ParameterQueryResult?)
