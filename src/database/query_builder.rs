@@ -1,6 +1,6 @@
-use sea_orm::{DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryOrder, QuerySelect};
+use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryFilter as QF, QueryOrder, QuerySelect};
 
-use crate::global::parameter_query_builder::{ParameterQueryResult, QuerySort};
+use crate::global::parameter_query_builder::{ParameterQueryResult, QueryFilter, QuerySort};
 
 pub struct QueryBuilder;
 
@@ -50,119 +50,119 @@ impl QueryBuilder {
         }
 
         // TODO: Build filter
-        // for filterList in query_result.filter_list {
-        //     let mut conditions = Condition::all();
-        //     for filter in filterList.filter_list {
-        //         for column in E::Column::iter() {
-        //             let column_name: &str = &column.as_str();
-        //
-        //             if filter.property != column_name.to_string() {
-        //                 continue;
-        //             }
-        //
-        //             match filter.filter {
-        //                 QueryFilter::GT => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::gt(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::gt(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::gt(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //                 QueryFilter::GTE => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::gte(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::gte(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::gte(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //                 QueryFilter::LT => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::lt(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::lt(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::lt(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //                 QueryFilter::LTE => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::lte(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::lte(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::lte(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //                 QueryFilter::EQ => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::eq(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::eq(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::eq(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //                 QueryFilter::NE => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::ne(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::ne(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::ne(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //                 QueryFilter::LIKE => {
-        //                     conditions = conditions.clone().add(E::Column::contains(&column, filter.value));
-        //                 }
-        //                 QueryFilter::CURSOR => {
-        //                     match parse_number(&filter.value) {
-        //                         NumberType::Integer(value) => {
-        //                             conditions = conditions.clone().add(E::Column::gte(&column, value));
-        //                         }
-        //                         NumberType::Float(value) => {
-        //                             conditions = conditions.clone().add(E::Column::gte(&column, value));
-        //                         }
-        //                         NumberType::Invalid => {
-        //                             conditions = conditions.clone().add(E::Column::gte(&column, filter.value));
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //
-        //             break;
-        //         }
-        //     }
-        //
-        //     base_query = base_query.clone().filter(conditions);
-        // }
+        for filterList in query_result.filter_list {
+            let mut conditions = Condition::all();
+            for filter in filterList.filter_list {
+                for column in E::Column::iter() {
+                    let column_name: &str = &column.as_str();
+
+                    if filter.property != column_name.to_string() {
+                        continue;
+                    }
+
+                    match filter.filter {
+                        QueryFilter::GT => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::gt(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::gt(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::gt(&column, filter.value));
+                                }
+                            }
+                        }
+                        QueryFilter::GTE => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::gte(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::gte(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::gte(&column, filter.value));
+                                }
+                            }
+                        }
+                        QueryFilter::LT => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::lt(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::lt(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::lt(&column, filter.value));
+                                }
+                            }
+                        }
+                        QueryFilter::LTE => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::lte(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::lte(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::lte(&column, filter.value));
+                                }
+                            }
+                        }
+                        QueryFilter::EQ => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::eq(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::eq(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::eq(&column, filter.value));
+                                }
+                            }
+                        }
+                        QueryFilter::NE => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::ne(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::ne(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::ne(&column, filter.value));
+                                }
+                            }
+                        }
+                        QueryFilter::LIKE => {
+                            conditions = conditions.clone().add(E::Column::contains(&column, filter.value));
+                        }
+                        QueryFilter::CURSOR => {
+                            match parse_number(&filter.value) {
+                                NumberType::Integer(value) => {
+                                    conditions = conditions.clone().add(E::Column::gte(&column, value));
+                                }
+                                NumberType::Float(value) => {
+                                    conditions = conditions.clone().add(E::Column::gte(&column, value));
+                                }
+                                NumberType::Invalid => {
+                                    conditions = conditions.clone().add(E::Column::gte(&column, filter.value));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            base_query = base_query.clone().filter(conditions);
+        }
 
         base_query
             .all(db)
