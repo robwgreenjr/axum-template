@@ -99,7 +99,6 @@ pub struct ColumnFilterList {
 impl ParameterQueryResult {
     fn build_query_result(query: Option<String>) -> ParameterQueryResult {
         // TODO: Figure out how to handle errors properly for the application in general
-
         let mut result = ParameterQueryResult {
             filter_list: vec![],
             sort_list: HashMap::new(),

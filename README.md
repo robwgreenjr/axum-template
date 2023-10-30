@@ -1,6 +1,8 @@
 ## TODO
 
-### - Handle Error responses
+### - Create response builder for meta data
+
+### - Setup error response design
 
 ### - Setup integration testing
 
@@ -23,3 +25,5 @@
 ### - Create cli tool for basic things e.g create admin user, reset password, and migration/seeder if needed
 
 ### - Document query parameter builder
+
+### - Any general clean up for template design

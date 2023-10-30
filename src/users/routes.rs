@@ -5,39 +5,19 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use chrono::Utc;
 use sea_orm::{ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect};
-use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 use crate::database::query_builder::QueryBuilder;
+use crate::global::error_handling::ErrorDetailsDto;
 use crate::global::parameter_query_builder::ParameterQueryBuilder;
+use crate::global::response_builder::{DataResponse, MetaData};
 use crate::users::user;
-
-#[derive(Serialize, Deserialize)]
-pub struct DataResponse<T> {
-    meta: MetaData,
-    data: Vec<T>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct MetaData {
-    timestamp: String,
-    count: u64,
-    page: u64,
-    page_count: u64,
-    limit: u64,
-    cursor: String,
-    next: u64,
-    previous: u64,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct MetaQueryData {}
 
 // TODO: Finish all user routes
 pub async fn find_all(
     state: State<Arc<AppState>>,
     ParameterQueryBuilder(parameter_query_result): ParameterQueryBuilder,
-) -> Result<Json<DataResponse<user::Model>>, (StatusCode, &'static str)> {
+) -> Result<Json<DataResponse<user::Model>>, (StatusCode, Json<DataResponse<user::Model>>)> {
     let limit = 200;
 
     let users: Vec<user::Model> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
@@ -80,7 +60,7 @@ pub async fn find_all(
         0
     };
 
-    let response = DataResponse {
+    let mut response = DataResponse {
         meta: MetaData {
             timestamp: Utc::now().to_string(),
             count,
@@ -91,10 +71,21 @@ pub async fn find_all(
             next: next_id as u64,
             previous: previous_id as u64,
         },
+        errors: vec![],
         data: users,
     };
 
-    Ok(Json::from(response))
+    response.errors.push(ErrorDetailsDto {
+        status_code: 400,
+        error: "Bad Request".to_string(),
+        message: "wtf".to_string(),
+    });
+
+    response.data = vec![];
+
+    Err((StatusCode::BAD_REQUEST, Json::from(response)))
+
+    // Ok(Json::from(response))
 }
 
 pub fn user_routes() -> Router<Arc<AppState>> {
