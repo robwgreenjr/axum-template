@@ -9,6 +9,6 @@ pub struct ErrorDetailsDto {
 }
 
 pub struct ErrorDetails {
-    status_code: StatusCode,
-    message: String,
+    pub status_code: StatusCode,
+    pub message: String,
 }

@@ -1,5 +1,7 @@
+use http::StatusCode;
 use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryFilter as QF, QueryOrder, QuerySelect};
 
+use crate::global::error_handling::ErrorDetails;
 use crate::global::parameter_query_builder::{ParameterQueryResult, QueryFilter, QuerySort};
 
 pub struct QueryBuilder;
@@ -164,10 +166,19 @@ impl QueryBuilder {
             base_query = base_query.clone().filter(conditions);
         }
 
-        base_query
+        match base_query
             .all(db)
-            .await
-            .expect("Cannot find entity")
+            .await {
+            Ok(result) => {
+                result
+            }
+            Err(_error) => {
+                ErrorDetails {
+                    status_code: StatusCode::INTERNAL_SERVER_ERROR,
+                    message: "".to_string(),
+                }
+            }
+        }
     }
 }
 
