@@ -3,29 +3,35 @@ use std::sync::Arc;
 use axum::{Json, Router, routing::get};
 use axum::extract::State;
 use axum::http::StatusCode;
-use sea_orm::{EntityTrait, PaginatorTrait};
+use sea_orm::EntityTrait;
 
 use crate::AppState;
 use crate::database::query_builder::QueryBuilder;
+use crate::global::error_handling::ErrorDetails;
 use crate::global::parameter_query_builder::ParameterQueryBuilder;
-use crate::global::response_builder::DataListResponse;
+use crate::global::response_builder::{DataListResponse, DataListResponseDto};
 use crate::users::user;
+use crate::users::user::Model;
 
 // TODO: Finish all user routes
 pub async fn find_all(
     state: State<Arc<AppState>>,
     ParameterQueryBuilder(parameter_query_result): ParameterQueryBuilder,
-) -> Result<Json<DataListResponse<user::Model>>, (StatusCode, Json<DataListResponse<user::Model>>)> {
-    let users: Vec<user::Model> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
+) -> Result<Json<DataListResponseDto<'static, Model>>, (StatusCode, Json<DataListResponseDto<'static, Model>>)> {
+    let users: Result<Vec<Model>, Vec<ErrorDetails>> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
 
-    let count = user::Entity::find()
-        .count(&state.db)
-        .await
-        .expect("Cannot count users");
+    match users {
+        Ok(users) => {
+            let data: DataListResponse<Model> = DataListResponse::init::<user::Entity>(&state.db, Some(users), None).await;
 
-    let data: DataListResponse<user::Model> = DataListResponse::init::<user::Entity>(&state.db, users).await;
+            data.respond()
+        }
+        Err(errors) => {
+            let data: DataListResponse<Model> = DataListResponse::init::<user::Entity>(&state.db, None, Some(errors)).await;
 
-    DataListResponse::respond(&data)
+            data.respond()
+        }
+    }
 }
 
 pub fn user_routes() -> Router<Arc<AppState>> {

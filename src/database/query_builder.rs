@@ -10,7 +10,7 @@ impl QueryBuilder {
     pub async fn get_list<E: EntityTrait>(
         db: &DatabaseConnection,
         query_result: ParameterQueryResult,
-    ) -> Vec<<E as EntityTrait>::Model>
+    ) -> Result<Vec<<E as EntityTrait>::Model>, Vec<ErrorDetails>>
     {
         let mut base_query = E::find()
             .limit(u64::from(query_result.limit));
@@ -170,13 +170,13 @@ impl QueryBuilder {
             .all(db)
             .await {
             Ok(result) => {
-                result
+                Ok(result)
             }
             Err(_error) => {
-                ErrorDetails {
+                Err(vec![ErrorDetails {
                     status_code: StatusCode::INTERNAL_SERVER_ERROR,
                     message: "".to_string(),
-                }
+                }])
             }
         }
     }
