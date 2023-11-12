@@ -34,7 +34,28 @@ pub async fn find_all(
     }
 }
 
+pub async fn find(
+    state: State<Arc<AppState>>,
+    ParameterQueryBuilder(parameter_query_result): ParameterQueryBuilder,
+) -> Result<Json<DataListResponseDto<Model>>, (StatusCode, Json<DataListResponseDto<Model>>)> {
+    let user: Result<Vec<Model>, Vec<ErrorDetails>> = Ok(vec![]);
+
+    match user {
+        Ok(user) => {
+            let data: DataListResponse<Model> = DataListResponse::init::<user::Entity>(&state.db, Some(user), None).await;
+
+            data.respond()
+        }
+        Err(errors) => {
+            let data: DataListResponse<Model> = DataListResponse::init::<user::Entity>(&state.db, None, Some(errors)).await;
+
+            data.respond()
+        }
+    }
+}
+
 pub fn user_routes() -> Router<Arc<AppState>> {
     Router::new()
         .route("/users", get(find_all))
+        .route("/user", get(find))
 }

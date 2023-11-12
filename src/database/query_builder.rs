@@ -52,9 +52,9 @@ impl QueryBuilder {
         }
 
         // TODO: Build filter
-        for filterList in query_result.filter_list {
+        for filter_list in query_result.filter_list {
             let mut conditions = Condition::all();
-            for filter in filterList.filter_list {
+            for filter in filter_list.filter_list {
                 for column in E::Column::iter() {
                     let column_name: &str = &column.as_str();
 

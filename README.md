@@ -1,10 +1,10 @@
 ## TODO
 
+### - Setup first integration test
+
 ### - Create response builder for meta data
 
 ### - Setup error response design
-
-### - Setup integration testing
 
 ### - Create more test to support various errors with parameter and db query builder
 
