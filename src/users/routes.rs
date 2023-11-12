@@ -17,7 +17,7 @@ use crate::users::user::Model;
 pub async fn find_all(
     state: State<Arc<AppState>>,
     ParameterQueryBuilder(parameter_query_result): ParameterQueryBuilder,
-) -> Result<Json<DataListResponseDto<'static, Model>>, (StatusCode, Json<DataListResponseDto<'static, Model>>)> {
+) -> Result<Json<DataListResponseDto<Model>>, (StatusCode, Json<DataListResponseDto<Model>>)> {
     let users: Result<Vec<Model>, Vec<ErrorDetails>> = QueryBuilder::get_list::<user::Entity>(&state.db, parameter_query_result).await;
 
     match users {

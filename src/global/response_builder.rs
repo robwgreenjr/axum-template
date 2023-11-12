@@ -7,10 +7,10 @@ use serde::{Deserialize, Serialize};
 use crate::global::error_handling::{ErrorDetails, ErrorDetailsDto};
 
 #[derive(Serialize, Deserialize)]
-pub struct DataListResponseDto<'a, T> {
+pub struct DataListResponseDto<T> {
     pub meta: MetaListDataDto,
     pub errors: Vec<ErrorDetailsDto>,
-    pub data: Vec<&'a T>,
+    pub data: Vec<T>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -119,7 +119,7 @@ impl<T> DataListResponse<T> {
         }
     }
 
-    pub fn respond(&self) -> Result<Json<DataListResponseDto<T>>, (StatusCode, Json<DataListResponseDto<T>>)> {
+    pub fn respond(self) -> Result<Json<DataListResponseDto<T>>, (StatusCode, Json<DataListResponseDto<T>>)> {
         if !self.errors.is_empty() {
             match self.errors.first() {
                 None => {
@@ -134,14 +134,12 @@ impl<T> DataListResponse<T> {
         }
     }
 
-    fn to_dto(&self) -> DataListResponseDto<T> {
-        let test = DataListResponseDto {
+    fn to_dto(self) -> DataListResponseDto<T> {
+        DataListResponseDto {
             meta: self.meta.to_dto(),
             errors: self.errors.into_iter().map(|error| error.to_dto()).collect(),
-            data: self.data.iter().collect(),
-        };
-
-        test
+            data: self.data,
+        }
     }
 }
 
