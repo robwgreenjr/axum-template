@@ -1,7 +1,7 @@
 use axum::Json;
 use chrono::{DateTime, Utc};
 use http::StatusCode;
-use sea_orm::{DatabaseConnection, EntityTrait};
+use sea_orm::{DatabaseConnection, EntityTrait, ModelTrait, PaginatorTrait};
 use serde::{Deserialize, Serialize};
 
 use crate::global::error_handling::{ErrorDetails, ErrorDetailsDto};
@@ -88,7 +88,20 @@ impl MetaListData {
 }
 
 impl<T> DataListResponse<T> {
-    pub async fn init<E: EntityTrait>(db: &DatabaseConnection, data: Option<Vec<T>>, errors: Option<Vec<ErrorDetails>>) -> DataListResponse<T> {
+    pub async fn init<E, M>(
+        db: &DatabaseConnection,
+        data: Option<Vec<T>>,
+        errors: Option<Vec<ErrorDetails>>,
+    ) -> DataListResponse<T>
+        where
+            E: EntityTrait<Model=M>,
+            M: ModelTrait,
+    {
+        let count = E::find()
+            .count(db)
+            .await
+            .expect("Error counting");
+
         Self {
             meta: MetaListData {
                 timestamp: Utc::now(),
