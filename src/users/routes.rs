@@ -18,7 +18,7 @@ pub async fn find_all(
     ParameterQueryBuilder(parameter_query_result): ParameterQueryBuilder,
 ) -> Result<Json<DataListResponseDto<Model>>, (StatusCode, Json<DataListResponseDto<Model>>)> {
     let users: Result<Vec<Model>, Vec<ErrorDetails>> = QueryBuilder::get_list::<Entity>(&state.db, parameter_query_result).await;
-    let testing = Entity::find();
+
     match users {
         Ok(users) => {
             let data: DataListResponse<Model> = DataListResponse::init::<Entity, Model>(&state.db, Some(users), None).await;
