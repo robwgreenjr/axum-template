@@ -9,7 +9,7 @@ use http::request::Parts;
 #[derive(Debug)]
 pub struct ParameterQueryBuilder(pub ParameterQueryResult);
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub enum QuerySort {
     ASC,
     DESC,
@@ -27,7 +27,7 @@ impl FromStr for QuerySort {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub enum QueryFilter {
     GT,
     GTE,
@@ -57,7 +57,7 @@ impl FromStr for QueryFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub enum QueryOperator {
     AND,
     OR,
@@ -75,14 +75,14 @@ impl FromStr for QueryOperator {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ParameterQueryResult {
     pub filter_list: Vec<ColumnFilterList>,
     pub sort_list: HashMap<QuerySort, Vec<String>>,
-    pub limit: u8,
+    pub limit: u64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ColumnFilter {
     pub operator: QueryOperator,
     pub filter: QueryFilter,
@@ -90,7 +90,7 @@ pub struct ColumnFilter {
     pub value: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ColumnFilterList {
     pub operator: QueryOperator,
     pub filter_list: Vec<ColumnFilter>,
@@ -321,6 +321,29 @@ impl ParameterQueryResult {
         }
 
         result
+    }
+
+    pub fn remove_cursor(&mut self) {
+        self.filter_list.iter_mut().for_each(|column_filter| {
+            column_filter.filter_list.retain(|filter| filter.filter != QueryFilter::CURSOR);
+        });
+    }
+
+    pub fn set_less_than(&mut self, property: &str, value: String) {
+        let mut filter_list: Vec<ColumnFilter> = vec![];
+        let column_filter = ColumnFilter {
+            operator: QueryOperator::AND,
+            filter: QueryFilter::LT,
+            property: property.to_string(),
+            value,
+        };
+        filter_list.push(column_filter);
+
+        let column_filter_list = ColumnFilterList {
+            operator: QueryOperator::AND,
+            filter_list,
+        };
+        self.filter_list.push(column_filter_list);
     }
 }
 

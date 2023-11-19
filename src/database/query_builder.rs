@@ -1,8 +1,14 @@
 use http::StatusCode;
-use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryFilter as QF, QueryOrder, QuerySelect};
+use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, IdenStatic, Iterable, QueryFilter as QF, QueryOrder, QuerySelect, Select};
 
 use crate::global::error_handling::ErrorDetails;
 use crate::global::parameter_query_builder::{ParameterQueryResult, QueryFilter, QuerySort};
+use crate::global::response_builder::MetaListData;
+
+pub struct QueryResult<T> {
+    pub data: Vec<T>,
+    pub meta: MetaListData,
+}
 
 pub struct QueryBuilder;
 
@@ -12,8 +18,25 @@ impl QueryBuilder {
         query_result: ParameterQueryResult,
     ) -> Result<Vec<<E as EntityTrait>::Model>, Vec<ErrorDetails>>
     {
-        let mut base_query = E::find()
-            .limit(u64::from(query_result.limit));
+        let base_query = QueryBuilder::generate(E::find(), query_result);
+
+        match base_query
+            .all(db)
+            .await {
+            Ok(result) => {
+                Ok(result)
+            }
+            Err(_error) => {
+                Err(vec![ErrorDetails {
+                    status_code: StatusCode::INTERNAL_SERVER_ERROR,
+                    message: "".to_string(),
+                }])
+            }
+        }
+    }
+
+    pub fn generate<E: EntityTrait>(select: Select<E>, query_result: ParameterQueryResult) -> Select<E> {
+        let mut base_query = select.limit(u64::from(query_result.limit));
 
         // TODO: Move sort logic to function
         for sort in query_result.sort_list {
@@ -166,18 +189,20 @@ impl QueryBuilder {
             base_query = base_query.clone().filter(conditions);
         }
 
-        match base_query
-            .all(db)
-            .await {
-            Ok(result) => {
-                Ok(result)
-            }
-            Err(_error) => {
-                Err(vec![ErrorDetails {
-                    status_code: StatusCode::INTERNAL_SERVER_ERROR,
-                    message: "".to_string(),
-                }])
-            }
+        base_query
+    }
+
+    pub fn page_count(total_count: u64, limit: u64) -> u64 {
+        let page_count_calculation: f64 = total_count as f64 / limit as f64;
+        page_count_calculation.ceil() as u64
+    }
+
+    pub fn current_page(total_count: u64, remaining_count: u64, limit: u64) -> u64 {
+        let mut current_page = (total_count - remaining_count) as f64 / limit as f64;
+        if current_page % 1.0 != 0.0 {
+            current_page.ceil() as u64
+        } else {
+            (current_page + 1.0) as u64
         }
     }
 }
