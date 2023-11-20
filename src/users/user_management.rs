@@ -45,7 +45,7 @@ pub async fn get_all(
         .all(db).await
         .expect("Cannot find users");
 
-    let next = if !next_result.is_empty() {
+    let next = if !next_result.is_empty() && users.len() as u64 == query_result.limit {
         next_result.last().unwrap().id
     } else {
         0

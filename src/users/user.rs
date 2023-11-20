@@ -23,7 +23,7 @@ pub struct Index {
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "user_simple")]
+#[sea_orm(table_name = "user_base")]
 pub struct Model {
     #[sea_orm(unique)]
     pub id: i32,

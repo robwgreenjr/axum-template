@@ -1,8 +1,8 @@
 ## TODO
 
-### - Setup first integration test
+### - Setup shared database on single thread for multiple tests (finish e2e test design)
 
-### - Create response builder for meta data
+### - Finalize response builder for meta data
 
 ### - Setup error response design
 
